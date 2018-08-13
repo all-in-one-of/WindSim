@@ -1,0 +1,74 @@
+README
+------------
+------------
+H.O.G.W.A.R.T.S. - Handy Offline Grid-based Wind Advection Reverse Time Solver
+
+Created by Jacob Snipes
+Advised by Dr. Chenfanfu Jiang
+
+University of Pennsylvania SIG Center for Computer Graphics
+Summer 2018
+------------
+OVERVIEW
+------------
+The code base is adapted from the Smoke Simulator project from CIS 563, Spring 2018. This solver was created to interface with a Unity VR data visualization project advised by Dr. Bo Sun at Rowan University, and the original problem statement comes from VAST's 2017 Mini Challenge 2.
+
+Relevant Source Files: constants.h/constants.cpp, mac_grid.h/mac_grid.cpp, main.cpp, smoke_sim.h/smoke_sim.cpp
+Required Data Files: concData.csv, windData.csv
+
+Source File Location: cispba/Projects/Wind (all H and CPP files are here)
+Output File Location: cispba/Projects/records (all BGEO and TSV files will be written here)
+
+Required Third-Party Libraries: Eigen, Partio
+Required Software: Houdini
+
+
+NOTE: The relevant source files listed above are heavily commented; as such, the following document only outlines the high-level structure of the relevant files. Please refer to the inline comments for further clarification.
+
+------------
+SOURCE FILES
+------------
+constants.h and constants.cpp
+
+This file sets up all of the constant global variables that will be used throughout the simulation; these values are all you will need to modify in order to tweak the simulation. Make sure to modify the values of the constants in the cpp file, not the h file! Additionally, be sure to declare any new variables as "const" in constants.cpp and as "extern const" in constants.h.
+------------
+mac_grid.h and mac_grid.cpp
+
+This file contains numerous functions to determine the state of the simulation at every time step. It additionally includes functions to handle TSV writing using standard output functions and BGEO writing using Partio (which must be rendered with Houdini). Note that there are hardcoded matrix dimensions within the writeTravelTimes() function (around line 1165); be sure to modify these if you wish to run this with different conditions on the number of sources and sensors.
+------------
+main.cpp
+
+This file is fairly self-explanatory, as it only contains an infinite loop that calls the step() function from smoke_sim.cpp. There are conditions set within other functions that allow the program to autonomously exit when appropriate.
+------------
+smoke_sim.h and smoke_sim.cpp
+
+This file contains CSV parsing functions, the core step() function, and an output function called grabScreen(). The step() function simply applies all of the solver logic from mac_grid.cpp to advance the simulation then calls grabScreen() to save it; grabScreen(), in turn, calls the appropriate output functions from mac_grid.cpp.
+
+------------
+INPUT FILES
+------------
+concData.csv and windData.csv
+
+These files contain the input data from VAST's 2017 Mini Challenge 2. Due to the way the parsers are written, one may change the data, but the format must remain the same. It is assumed that concentration data was collected every hour, while wind data was collected every 3 hours.
+
+------------
+OUTPUT FILES
+------------
+frameX.bgeo and FieldFrameX.bgeo
+
+These files contain the particle simulation and velocity field data respectively. They can be rendered with Houdini. Note that running a new simulation will overwrite the existing BGEO files!
+------------
+calcTravelTimes.txt or travelTimes.txt
+
+This file contains a 4 x 9 matrix of the average travel times between all factory-sensor pairs, depending on the value of the writeActualTimes boolean. Note that the times in calcTravelTimes.txt are in hours while those in travelTimes.txt are in seconds!
+------------
+chemicalOutput.txt
+
+This file contains a 4 x 9 matrix of the outputs, in PPM, of each chemical from each factory.
+------------
+OTHER FILES
+------------
+windTest.hipnc
+
+This is the Houdini file that will render the written BGEO files.
+
